@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  # Layanan untuk aplikasi Go
+  go-api:
+    build: .  # Bangun image dari Dockerfile yang ada di direktori ini
+    container_name: go-api-container
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: user
+      DB_PASSWORD: password
+      DB_NAME: dbname
+    ports:
+      - "8080:8080"  # Memetakan port 8080 di kontainer ke 8080 di host
+    depends_on:
+      - postgres  # Pastikan PostgreSQL siap sebelum memulai aplikasi Go
+    volumes:
+      - .:/app  # Memetakan direktori lokal ke direktori /app di dalam kontainer
+
+  # Layanan untuk PostgreSQL
+  postgres:
+    image: postgres:14  # Menggunakan image resmi PostgreSQL versi 14
+    container_name: postgres-container
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: dbname
+    ports:
+      - "5432:5432"  # Memetakan port 5432 di kontainer ke 5432 di host
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Simpan data PostgreSQL pada volume lokal
+
+# Volume untuk menyimpan data PostgreSQL
+volumes:
+  postgres_data:
+    driver: local
